@@ -1,0 +1,94 @@
+CREATE TABLE apple_store_combined As 
+
+SELECT * FROM appleStore_description1
+
+UNION ALL
+
+SELECT * FROM appleStore_description2
+
+Union ALL
+
+Select * From appleStore_description3
+
+Union All 
+
+Select * From appleStore_description4
+
+
+**EXPLORATORY DATA ANALYSIS**
+
+--check number of unique tables in both tablesAppleStore
+
+SELECT COUNT(DISTINCT id) As UniqueAppIDs
+FROM AppleStore
+
+Select Count(DISTINCT id) As UniqueAppIDs
+From apple_store_combined
+
+--check for any missing values in key fields
+
+SELECT Count(*) As MissingValues
+From apple_store_combined
+WHERE app_desc is null
+
+--Find out the number of apps per genre
+
+SELECT prime_genre, COUNT(*) as NumApps
+From AppleStore
+Group By prime_genre
+Order by NumApps DESC
+
+--Get an overview of apps rating 
+
+SELECT min(user_rating) As MinRating,
+       max(user_rating) As MaxRating,
+       avg(user_rating) As AvgRating
+FROM   AppleStore
+
+-- Get distribution of app prices
+
+SELECT 
+     
+       (price / 2) *2 As PriceBinStart,
+       ((price / 2) *2) +2 AS PriceBinEnd, 
+       Count(*) As NumApps
+      
+FROM AppleStore
+
+Group By PriceBinStart
+Order By PriceBinStart
+
+***DATA ANALYSIS***
+
+----Determine whether paid apps have higher ratings than free apps
+
+Select Case 
+       When price > 0 Then 'Paid'
+       Else 'Free'
+      End As App_type,
+      avg(user_rating) AS Avg_Rating
+      
+ FROM AppleStore
+ GROUP BY App_type
+ 
+ --check if apps with more supported languages have higher rating
+ 
+ SELECT CASE
+     When lang_num < 10 Then '<10 languages'
+     When lang_num BETWEEN 10 And 30 Then '10-30 languages'
+     else '>30 languages'
+     End as language_bucket,
+     avg(user_rating) as Avg_rating
+     
+From AppleStore
+Group By language_bucket
+Order By Avg_rating DESC
+
+--Check genres with low ratings
+
+Select prime_genre,
+    avg(user_rating) as Avg_rating
+From AppleStore
+Group By prime_genre
+Order By Avg_rating ASC
+Limit 10
